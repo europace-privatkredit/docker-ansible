@@ -1,3 +1,5 @@
+# Ansible in Docker
+
 A simple yet flexible Ansible environment in Docker.
 
 It expects your Ansible project at path `/ansible`. You can build your own container and copy it there or simply use a volume mount.
@@ -41,5 +43,5 @@ docker run -it --rm
   -v "${YOUR_VAULT_KEY_FILE}:/ansible-support/vault_key:ro"
   -e "ANSIBLE_PRIVATE_KEY_FILE=/ansible-support/id_rsa"
   -e "ANSIBLE_VAULT_PASSWORD_FILE=/ansible-support/vault_key"
-  hypoport/ansible:9.3.0 ansible-playbook --help
+  hypoport/ansible:12.1.0 ansible-playbook --help
 ```
