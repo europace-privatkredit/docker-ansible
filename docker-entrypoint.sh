@@ -31,7 +31,7 @@ fi
 ANSIBLE_COMMANDS=$(find /usr/bin/ -name 'ansible*' -exec basename {} \;)
 for ansible_command in $ANSIBLE_COMMANDS; do
   if [ "$1" == "${ansible_command}" ]; then
-    source /home/ansible/venv/bin/activate
+    . /home/ansible/venv/bin/activate
     exec gosu ansible "$@"
   fi
 done
