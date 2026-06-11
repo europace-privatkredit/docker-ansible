@@ -36,9 +36,8 @@ RUN if [ "${TARGETARCH}" = "amd64" ]; then \
   unzip awscliv2.zip && \
   ./aws/install && \
   rm -rf awscliv2.zip awscliv2.sig aws && \
-  chown -R ansible:ansible /home/ansible/venv && \
   mkdir /home/ansible/.ssh && \
-  chown ansible:ansible /home/ansible/.ssh && \
+  chown -R ansible:ansible /home/ansible && \
   chmod 0700 /home/ansible/.ssh && \
   ansible --version
 

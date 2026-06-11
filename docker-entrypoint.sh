@@ -1,6 +1,11 @@
 #!/bin/sh
 
-PRIVATE_KEY_FILE=$(ansible-config dump | grep DEFAULT_PRIVATE_KEY_FILE | cut -d = -f 2 | awk '{$1=$1};1')
+# Ensure the SSH agent socket (e.g. from 1Password) is accessible by the ansible user
+if [ -S "${SSH_AUTH_SOCK}" ]; then
+  chmod 777 "${SSH_AUTH_SOCK}"
+fi
+
+PRIVATE_KEY_FILE=$(gosu ansible /home/ansible/venv/bin/ansible-config dump | grep DEFAULT_PRIVATE_KEY_FILE | cut -d = -f 2 | awk '{$1=$1};1')
 if [ -f "${PRIVATE_KEY_FILE}" ]; then
 
   # Copy key to Ansible home and take ownership
@@ -16,7 +21,7 @@ if [ -f "${PRIVATE_KEY_FILE}" ]; then
 
 fi
 
-VAULT_PASSWORD_FILE=$(ansible-config dump | grep DEFAULT_VAULT_PASSWORD_FILE | cut -d = -f 2 | awk '{$1=$1};1')
+VAULT_PASSWORD_FILE=$(gosu ansible /home/ansible/venv/bin/ansible-config dump | grep DEFAULT_VAULT_PASSWORD_FILE | cut -d = -f 2 | awk '{$1=$1};1')
 if [ -f "${VAULT_PASSWORD_FILE}" ]; then
 
   # Copy vault password to Ansible home and take ownership
@@ -28,9 +33,10 @@ if [ -f "${VAULT_PASSWORD_FILE}" ]; then
 
 fi
 
-ANSIBLE_COMMANDS=$(find /usr/bin/ -name 'ansible*' -exec basename {} \;)
+ANSIBLE_COMMANDS=$(find /home/ansible/venv/bin/ -name 'ansible*' -exec basename {} \;)
 for ansible_command in $ANSIBLE_COMMANDS; do
-  if [ "$1" == "${ansible_command}" ]; then
+  if [ "$1" = "${ansible_command}" ]; then
+    rm -rf /home/ansible/.ansible
     . /home/ansible/venv/bin/activate
     exec gosu ansible "$@"
   fi
