@@ -19,7 +19,7 @@ RUN if [ "${TARGETARCH}" = "amd64" ]; then \
     echo "Unsupported architecture: ${TARGETARCH}}" &>2; return 1; \
   fi && \
   mkdir /ansible && mkdir /ansible-support && \
-  apt-get update && apt-get -y upgrade && apt-get -y install git gosu tar unzip rsync openssh-client curl gpg && rm -rf /var/lib/apt/lists/* && \
+  apt-get update && apt-get -y upgrade && apt-get -y install git gosu tar unzip rsync openssh-client curl gpg socat && rm -rf /var/lib/apt/lists/* && \
   echo "Downloading https://s3.amazonaws.com/session-manager-downloads/plugin/latest/${SESSION_MANAGER_TARGET}/session-manager-plugin.deb" && \
   curl -s "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/${SESSION_MANAGER_TARGET}/session-manager-plugin.deb" -o "session-manager-plugin.deb" && \
   dpkg -i session-manager-plugin.deb && \
