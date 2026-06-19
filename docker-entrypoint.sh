@@ -1,8 +1,17 @@
 #!/bin/sh
 
-# Ensure the SSH agent socket (e.g. from 1Password) is accessible by the ansible user
+# Fork the SSH agent socket so the ansible user can access it without relaxing
+# permissions on the original socket (e.g. from 1Password)
 if [ -S "${SSH_AUTH_SOCK}" ]; then
-  chmod 777 "${SSH_AUTH_SOCK}"
+
+  ANSIBLE_SSH_AUTH_SOCK="/tmp/ssh-auth-sock-ansible"
+  socat UNIX-LISTEN:"${ANSIBLE_SSH_AUTH_SOCK}",fork,reuseaddr UNIX-CONNECT:"${SSH_AUTH_SOCK}" &
+  SOCAT_PID=$!
+  trap 'kill ${SOCAT_PID} 2>/dev/null; rm -f ${ANSIBLE_SSH_AUTH_SOCK}' EXIT
+  while [ ! -S "${ANSIBLE_SSH_AUTH_SOCK}" ]; do sleep 1; done
+  chown ansible:ansible "${ANSIBLE_SSH_AUTH_SOCK}"
+  export SSH_AUTH_SOCK="${ANSIBLE_SSH_AUTH_SOCK}"
+
 fi
 
 PRIVATE_KEY_FILE=$(gosu ansible /home/ansible/venv/bin/ansible-config dump | grep DEFAULT_PRIVATE_KEY_FILE | cut -d = -f 2 | awk '{$1=$1};1')

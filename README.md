@@ -90,3 +90,9 @@ docker run -it --rm \
 ## Ansible configuration via environment
 
 Any [Ansible environment variable](https://docs.ansible.com/ansible/latest/reference_appendices/config.html#ansible-configuration-settings) is passed through to Ansible unchanged. The exceptions are `ANSIBLE_PRIVATE_KEY_FILE` and `ANSIBLE_VAULT_PASSWORD_FILE`, which are rewritten by the entrypoint to point at copies owned by the `ansible` user.
+
+## Releasing
+
+```bash
+docker buildx build --platform linux/amd64,linux/arm64 -t hypoport/ansible:<version> --push .
+```
